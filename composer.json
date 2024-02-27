@@ -1,0 +1,31 @@
+{
+    "name": "ultra/data-tools",
+    "version": "1.0.0",
+    "type": "library",
+    "description": "This package is a part of the Ultra library.",
+    "license": "MIT",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/dlsrc/ultra-data-tools"
+        }
+    ],
+    "authors": [
+        {
+            "name": "Dmitry Lebedev",
+            "email": "dl@adios.ru",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4" : {
+            "Ultra\\Data\\" : "src/"
+        }
+    },
+    "require": {
+        "php": ">=8.3",
+        "ultra/chars": "^1.0.0",
+        "ultra/core": "^1.0.2",
+        "ultra/net": "^1.0.0"
+    }
+}
