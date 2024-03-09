@@ -25,7 +25,7 @@
     "require": {
         "php": ">=8.3",
         "ultra/chars": "^1.0.0",
-        "ultra/core": "^1.0.2",
+        "ultra/core": "^1.0.0",
         "ultra/net": "^1.0.0"
     }
 }
