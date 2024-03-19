@@ -150,7 +150,7 @@ class Temp {
 		return $this->field;
 	}
 
-	public function key(Browser $b, $target = false, $field = 'code', $set = Key::CHR, $size = 7) {
+	public function key(Browser $b, $target = false, $field = ['code'], $set = Key::CHR, $size = 7) {
 		if ('' == $this->key) {
 			$size = (int) $size;
 

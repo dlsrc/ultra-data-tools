@@ -8,7 +8,7 @@ namespace Ultra\Data\Tool;
 
 use Ultra\Core;
 use Ultra\Log;
-use Ultra\Data\Source;
+use Ultra\Data\Provider;
 
 class Exchanger {
 	const
@@ -67,7 +67,7 @@ class Exchanger {
 			$dsn = 'type=sqlite3&db='.$reg.'&mode=read&prefix='.$q['prefix'];
 		}
 
-		if (!$b = Source::browser($dsn)) {
+		if (!$b = Provider::Browser($dsn)) {
 			$q['errno'] = self::E_CONNECT;
 			$q['error'] = Log::get()->last()->message;
 			exit(Query::pack($q));
