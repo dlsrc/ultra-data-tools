@@ -6,6 +6,7 @@
  */
 namespace Ultra\Data\Tool;
 
+use Ultra\Data\Browser;
 use Ultra\Data\Inquirer;
 
 final class TreeSegment {	
@@ -76,34 +77,34 @@ final class TreeSegment {
 	* Метод переиндексации сегмента дерева.
 	* $segment - значение индекса сегментации
 	*/
-	public function reindex(Inquirer $db): void {
+	public function reindex(Browser $db): void {
 		$segment = array_keys($this->segment);
 		$data = array_values($this->segment);
 
 		foreach (array_keys($segment) as $id) {
-			$segment[$id] = '`'.$segment[$id].'` = "{'.$id.'}"';
+			$segment[$id] = ''.$segment[$id].' = "{'.$id.'}"';
 		}
 
 		$segment = implode(' AND ', $segment);
 
 		if ('' != $this->serial) {
-			$order = 'ORDER BY `'.$this->serial.'` ASC, `'.$this->id.'` ASC';
+			$order = 'ORDER BY '.$this->serial.' ASC, '.$this->id.' ASC';
 		}
 		else {
-			$order = 'ORDER BY `'.$this->id.'` ASC';
+			$order = 'ORDER BY '.$this->id.' ASC';
 		}
 
 		$db->run(
-			'UPDATE `'.$this->table.'` SET '.
-			'`'.$this->left.'` = 0, '.
-			'`'.$this->right.'` = 0 '.
+			'UPDATE '.$this->table.' SET '.
+			''.$this->left.' = 0, '.
+			''.$this->right.' = 0 '.
 			'WHERE '.$segment,
 			$data
 		);
 
 		$node = $db->assoc(
-			'SELECT `'.$this->id.'` AS `code` FROM `'.$this->table.'` '.
-			'WHERE '.$segment.' AND `'.$this->pid.'` = 0 '.$order,
+			'SELECT '.$this->id.' AS code FROM '.$this->table.' '.
+			'WHERE '.$segment.' AND '.$this->pid.' = 0 '.$order,
 			$data
 		);
 
@@ -114,11 +115,11 @@ final class TreeSegment {
 
 		for ($i = 0; $i < $size; $i++) {
 			$db->run(
-				'UPDATE `'.$this->table.'` SET '.
-				'`'.$this->left.'` = '.$left.', '.
-				'`'.$this->right.'` = '.$right.' '.
+				'UPDATE '.$this->table.' SET '.
+				''.$this->left.' = '.$left.', '.
+				''.$this->right.' = '.$right.' '.
 				'WHERE '.$segment.' '.
-				'AND `'.$this->id.'` = '.$node[$i]['code'],
+				'AND '.$this->id.' = '.$node[$i]['code'],
 				$data
 			);
 
@@ -131,8 +132,8 @@ final class TreeSegment {
 
 		while (isset($node[$i]['code'])) {
 			$child = $db->assoc(
-				'SELECT `'.$this->id.'` AS `code` FROM `'.$this->table.'` '.
-				'WHERE '.$segment.' AND `'.$this->pid.'` = '.$node[$i]['code'].' '.$order,
+				'SELECT '.$this->id.' AS code FROM '.$this->table.' '.
+				'WHERE '.$segment.' AND '.$this->pid.' = '.$node[$i]['code'].' '.$order,
 				$data
 			);
 
@@ -145,45 +146,45 @@ final class TreeSegment {
 	
 		for (; $k < $size; $k++) {
 			$parent = $db->result(
-				'SELECT `'.$this->pid.'` '.
-				'FROM `'.$this->table.'` '.
+				'SELECT '.$this->pid.' '.
+				'FROM '.$this->table.' '.
 				'WHERE '.$segment.' '.
-				'AND `'.$this->id.'` = '.$node[$k]['code'],
+				'AND '.$this->id.' = '.$node[$k]['code'],
 				$data
 			);
 
 			$left = $db->result(
-				'SELECT `'.$this->right.'` '.
-				'FROM `'.$this->table.'` '.
+				'SELECT '.$this->right.' '.
+				'FROM '.$this->table.' '.
 				'WHERE '.$segment.' '.
-				'AND `'.$this->id.'` = '.$parent,
+				'AND '.$this->id.' = '.$parent,
 				$data
 			);
 		
 			$right = $left + 1;
 
 			$db->run(
-				'UPDATE `'.$this->table.'` SET '.
-				'`'.$this->left.'` = `'.$this->left.'` + 2 '.
+				'UPDATE '.$this->table.' SET '.
+				''.$this->left.' = '.$this->left.' + 2 '.
 				'WHERE '.$segment.' '.
-				'AND `'.$this->left.'` > '.$left,
+				'AND '.$this->left.' > '.$left,
 				$data
 			);
 
 			$db->run(
-				'UPDATE `'.$this->table.'` SET '.
-				'`'.$this->right.'` = `'.$this->right.'` + 2 '.
+				'UPDATE '.$this->table.' SET '.
+				''.$this->right.' = '.$this->right.' + 2 '.
 				'WHERE '.$segment.' '.
-				'AND `'.$this->right.'` >= '.$left,
+				'AND '.$this->right.' >= '.$left,
 				$data
 			);
 
 			$db->run(
-				'UPDATE `'.$this->table.'` SET '.
-				'`'.$this->left.'` = '.$left.', '.
-				'`'.$this->right.'` = '.$right.' '.
+				'UPDATE '.$this->table.' SET '.
+				''.$this->left.' = '.$left.', '.
+				''.$this->right.' = '.$right.' '.
 				'WHERE '.$segment.' '.
-				'AND `'.$this->id.'` = '.$node[$k]['code'],
+				'AND '.$this->id.' = '.$node[$k]['code'],
 				$data
 			);
 		}
@@ -193,49 +194,49 @@ final class TreeSegment {
 	* Метод перерасчета глубины вложенности узлов дерева
 	* deep - имя поля в таблице хранящий уровень вложенности.
 	*/
-	public function levelizing(Inquirer $db): void {
+	public function levelizing(Browser $db): void {
 		$segment = array_keys($this->segment);
 		$data = array_values($this->segment);
 
 		foreach (array_keys($segment) as $id) {
-			$segment[$id] = '`'.$segment[$id].'` = "{'.$id.'}"';
+			$segment[$id] = ''.$segment[$id].' = "{'.$id.'}"';
 		}
 
 		$segment = implode(' AND ', $segment);
 
 		if ('' != $this->serial) {
-			$order = 'ORDER BY `'.$this->serial.'` ASC, `'.$this->id.'` ASC';
+			$order = 'ORDER BY '.$this->serial.' ASC, '.$this->id.' ASC';
 		}
 		else {
-			$order = 'ORDER BY `'.$this->id.'` ASC';
+			$order = 'ORDER BY '.$this->id.' ASC';
 		}
 
 		$db->run(
-			'UPDATE `'.$this->table.'` SET '.
-			'`'.$this->deep.'` = 1 '.
+			'UPDATE '.$this->table.' SET '.
+			''.$this->deep.' = 1 '.
 			'WHERE '.$segment.' '.
-			'AND `'.$this->pid.'` = 0',
+			'AND '.$this->pid.' = 0',
 			$data
 		);
 
 		$node = $db->combine(
-			'SELECT `'.$this->id.'` FROM `'.$this->table.'` '.
-			'WHERE '.$segment.' AND `'.$this->pid.'` = 0 '.$order,
+			'SELECT '.$this->id.' FROM '.$this->table.' '.
+			'WHERE '.$segment.' AND '.$this->pid.' = 0 '.$order,
 			$data
 		);
 
 		for($deep=2; sizeof($node) > 0; $deep++) {
 			$db->run(
-				'UPDATE `'.$this->table.'` SET '.
-				'`'.$this->deep.'` = '.$deep.' '.
+				'UPDATE '.$this->table.' SET '.
+				''.$this->deep.' = '.$deep.' '.
 				'WHERE '.$segment.' '.
-				'AND `'.$this->pid.'` IN('.implode(',',$node).')',
+				'AND '.$this->pid.' IN('.implode(',',$node).')',
 				$data
 			);
 
 			$node = $db->combine(
-				'SELECT `'.$this->id.'` FROM `'.$this->table.'` '.
-				'WHERE '.$segment.' AND `'.$this->deep.'` = '.$deep.' '.$order,
+				'SELECT '.$this->id.' FROM '.$this->table.' '.
+				'WHERE '.$segment.' AND '.$this->deep.' = '.$deep.' '.$order,
 				$data
 			);
 		}

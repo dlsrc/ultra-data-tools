@@ -63,23 +63,23 @@ final class Tree {
 	*/
 	public function reindex(Inquirer $db, array $root = []): void {
 		$db->run(
-			'UPDATE `'.$this->table.'` SET '.
-			'`'.$this->left.'` = 0, '.
-			'`'.$this->right.'` = 0 '.
-			'WHERE `'.$this->id.'` <> 0'
+			'UPDATE '.$this->table.' SET '.
+			''.$this->left.' = 0, '.
+			''.$this->right.' = 0 '.
+			'WHERE '.$this->id.' <> 0'
 		);
 
 		if ('' != $this->serial) {
-			$order = 'ORDER BY `'.$this->serial.'` ASC, `'.$this->id.'` ASC';
+			$order = 'ORDER BY '.$this->serial.' ASC, '.$this->id.' ASC';
 		}
 		else {
-			$order = 'ORDER BY `'.$this->id.'` ASC';
+			$order = 'ORDER BY '.$this->id.' ASC';
 		}
 
 		if (empty($root)) {
 			$node = $db->assoc(
-				'SELECT `'.$this->id.'` AS `code` FROM `'.$this->table.'` '.
-				'WHERE `'.$this->pid.'` = 0 '.$order
+				'SELECT '.$this->id.' AS code FROM '.$this->table.' '.
+				'WHERE '.$this->pid.' = 0 '.$order
 			);
 		}
 		else {
@@ -97,10 +97,10 @@ final class Tree {
 
 		for ($i = 0; $i < $size; $i++) {
 			$db->run(
-				'UPDATE `'.$this->table.'` SET '.
-				'`'.$this->left.'` = '.$left.', '.
-				'`'.$this->right.'` = '.$right.' '.
-				'WHERE `'.$this->id.'` = '.$node[$i]['code']
+				'UPDATE '.$this->table.' SET '.
+				''.$this->left.' = '.$left.', '.
+				''.$this->right.' = '.$right.' '.
+				'WHERE '.$this->id.' = '.$node[$i]['code']
 			);
 
 			$left += 2;
@@ -112,8 +112,8 @@ final class Tree {
 
 		while (isset($node[$i]['code'])) {
 			$child = $db->assoc(
-				'SELECT `'.$this->id.'` AS `code` FROM `'.$this->table.'` '.
-				'WHERE `'.$this->pid.'` = '.$node[$i]['code'].' '.$order
+				'SELECT '.$this->id.' AS code FROM '.$this->table.' '.
+				'WHERE '.$this->pid.' = '.$node[$i]['code'].' '.$order
 			);
 
 			foreach ($child as $val) {
@@ -125,36 +125,36 @@ final class Tree {
 	
 		for (; $k < $size; $k++) {
 			$parent = $db->result(
-				'SELECT `'.$this->pid.'` '.
-				'FROM `'.$this->table.'` '.
-				'WHERE `'.$this->id.'` = '.$node[$k]['code']
+				'SELECT '.$this->pid.' '.
+				'FROM '.$this->table.' '.
+				'WHERE '.$this->id.' = '.$node[$k]['code']
 			);
 
 			$left = $db->result(
-				'SELECT `'.$this->right.'` '.
-				'FROM `'.$this->table.'` '.
-				'WHERE `'.$this->id.'` = '.$parent
+				'SELECT '.$this->right.' '.
+				'FROM '.$this->table.' '.
+				'WHERE '.$this->id.' = '.$parent
 			);
 		
 			$right = $left + 1;
 
 			$db->run(
-				'UPDATE `'.$this->table.'` SET '.
-				'`'.$this->left.'` = `'.$this->left.'` + 2 '.
-				'WHERE `'.$this->left.'` > '.$left
+				'UPDATE '.$this->table.' SET '.
+				''.$this->left.' = '.$this->left.' + 2 '.
+				'WHERE '.$this->left.' > '.$left
 			);
 
 			$db->run(
-				'UPDATE `'.$this->table.'` SET '.
-				'`'.$this->right.'` = `'.$this->right.'` + 2 '.
-				'WHERE `'.$this->right.'` >= '.$left
+				'UPDATE '.$this->table.' SET '.
+				''.$this->right.' = '.$this->right.' + 2 '.
+				'WHERE '.$this->right.' >= '.$left
 			);
 
 			$db->run(
-				'UPDATE `'.$this->table.'` SET '.
-				'`'.$this->left.'` = '.$left.', '.
-				'`'.$this->right.'` = '.$right.' '.
-				'WHERE `'.$this->id.'` = '.$node[$k]['code']
+				'UPDATE '.$this->table.' SET '.
+				''.$this->left.' = '.$left.', '.
+				''.$this->right.' = '.$right.' '.
+				'WHERE '.$this->id.' = '.$node[$k]['code']
 			);
 		}
 	}
@@ -165,33 +165,33 @@ final class Tree {
 	*/
 	public function levelizing(Inquirer $db, string $field): void {
 		if ('' != $this->serial) {
-			$order = 'ORDER BY `'.$this->serial.'` ASC, `'.$this->id.'` ASC';
+			$order = 'ORDER BY '.$this->serial.' ASC, '.$this->id.' ASC';
 		}
 		else {
-			$order = 'ORDER BY `'.$this->id.'` ASC';
+			$order = 'ORDER BY '.$this->id.' ASC';
 		}
 
 		$db->run(
-			'UPDATE `'.$this->table.'` SET '.
-			'`'.$field.'` = 1 '.
-			'WHERE `'.$this->pid.'` = 0'
+			'UPDATE '.$this->table.' SET '.
+			''.$field.' = 1 '.
+			'WHERE '.$this->pid.' = 0'
 		);
 
 		$node = $db->combine(
-			'SELECT `'.$this->id.'` FROM `'.$this->table.'` '.
-			'WHERE `'.$field.'` = 1 '.$order
+			'SELECT '.$this->id.' FROM '.$this->table.' '.
+			'WHERE '.$field.' = 1 '.$order
 		);
 
 		for($deep = 2; sizeof($node) > 0; $deep++) {
 			$db->run(
-				'UPDATE `'.$this->table.'` '.
-				'SET `'.$field.'` = '.$deep.' '.
-				'WHERE `'.$this->pid.'` IN('.implode(',',$node).')'
+				'UPDATE '.$this->table.' '.
+				'SET '.$field.' = '.$deep.' '.
+				'WHERE '.$this->pid.' IN('.implode(',',$node).')'
 			);
 
 			$node = $db->combine(
-				'SELECT `'.$this->id.'` FROM `'.$this->table.'` '.
-				'WHERE `'.$field.'` = '.$deep.' '.$order
+				'SELECT '.$this->id.' FROM '.$this->table.' '.
+				'WHERE '.$field.' = '.$deep.' '.$order
 			);
 		}
 	}

@@ -36,7 +36,7 @@ final class Unique {
 
 			foreach ($this->field as $table => $field) {
 				if ($count = $b->result(
-					'SELECT COUNT(*) FROM `~'.$table.'` WHERE `'.$field.'` = "'.$code.'"'
+					'SELECT COUNT(*) FROM ~'.$table.' WHERE '.$field.' = "'.$code.'"'
 				)) {
 					break;
 				}
