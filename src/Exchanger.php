@@ -74,7 +74,7 @@ class Exchanger {
 		}
 
 		$domain = $b->row(
-			'SELECT domain, proxy, mediator FROM ~domain
+			'SELECT domain, proxy, mediator FROM domain
 			WHERE domain = "{host}"', $q
 		);
 
@@ -132,7 +132,7 @@ class Exchanger {
 			}
 
 			$url = $b->row(
-				'SELECT post_id, url FROM ~register
+				'SELECT post_id, url FROM register
 				WHERE mediator = ""
 				AND source_id = "'.$q['source_id'].'"
 				AND recipient NOT LIKE "%['.$q['host'].']%"'
@@ -161,14 +161,14 @@ class Exchanger {
 			exit(Query::pack($q));
 
 		case 'SEND':
-			if ($q['send']['source_id'] = $b->result('SELECT source_id FROM ~source WHERE source = "{source}"', $q['send'])) {
+			if ($q['send']['source_id'] = $b->result('SELECT source_id FROM source WHERE source = "{source}"', $q['send'])) {
 				$q['errno'] = self::E_EXISTS;
 				$q['error'] = 'Source exists';
 				exit(Query::pack($q));
 			}
 
 			if (!$b->run(
-				'INSERT INTO ~source (timestamp, source, recipient, status)
+				'INSERT INTO source (timestamp, source, recipient, status)
 				VALUES ("{timestamp}", "{source}", "{recipient}", "{status}")',
 				$q['send']
 			)) {
@@ -181,14 +181,14 @@ class Exchanger {
 
 			foreach ($q['send']['ml'] as $data) {
 				$b->run(
-					'INSERT INTO ~source_header (source_id, lang_id, header)
+					'INSERT INTO source_header (source_id, lang_id, header)
 					VALUES ("'.$q['send']['source_id'].'", "{0}", "{1}")',
 					$data
 				);
 			}
 
 			$b->run(
-				'INSERT INTO ~replica (timestamp, source_id, post_id, post_code, url, domain, mediator)
+				'INSERT INTO replica (timestamp, source_id, post_id, post_code, url, domain, mediator)
 				VALUES ("{timestamp}", "{source_id}", "{post_id}", "{post_code}", "{url}", "{domain}", "{mediator}")',
 				$q['send']
 			);

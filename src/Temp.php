@@ -65,7 +65,7 @@ class Temp {
 	*/
 	public static function read(Browser $b, $key, $table='temp', $id='temp_id', $data='temp_data') {
 		$data = $b->result(
-			'SELECT '.$data.' FROM ~'.$table.' WHERE BINARY '.$id.' = "{0}"',
+			'SELECT '.$data.' FROM '.$table.' WHERE BINARY '.$id.' = "{0}"',
 			[$key]
 		);
 
@@ -87,13 +87,13 @@ class Temp {
 			];
 
 			$data = $b->result(
-				'SELECT '.$data.' FROM ~'.$table.' WHERE '.$data.' LIKE "%{0}%" OR '.$data.' LIKE "%{1}%" LIMIT 1',
+				'SELECT '.$data.' FROM '.$table.' WHERE '.$data.' LIKE "%{0}%" OR '.$data.' LIKE "%{1}%" LIMIT 1',
 				$like
 			);
 		}
 		else {
 			$data = $b->result(
-				'SELECT '.$data.' FROM ~'.$table.' WHERE '.$data.' LIKE "%{0}%" LIMIT 1',
+				'SELECT '.$data.' FROM '.$table.' WHERE '.$data.' LIKE "%{0}%" LIMIT 1',
 				['\''.$name.'\' => \''.$value.'\'']
 			);
 		}
@@ -107,19 +107,19 @@ class Temp {
 
 	public function inData(Browser $b, array $fields) {
 		$likes = $this->getLikes($fields);
-		return (bool) $b->result('SELECT COUNT(*) FROM ~'.$this->table.' WHERE '.implode(' OR ', $likes[0]), $likes[1]);
+		return (bool) $b->result('SELECT COUNT(*) FROM '.$this->table.' WHERE '.implode(' OR ', $likes[0]), $likes[1]);
 	}
 
 	public function isData(Browser $b, array $fields) {
 		$likes = $this->getLikes($fields);
-		return (bool) $b->result('SELECT COUNT(*) FROM ~'.$this->table.' WHERE '.implode(' AND ', $likes[0]), $likes[1]);
+		return (bool) $b->result('SELECT COUNT(*) FROM '.$this->table.' WHERE '.implode(' AND ', $likes[0]), $likes[1]);
 	}
 
 	public function getData(Browser $b, array $fields, $limit = '1') {
 		$likes = $this->getLikes($fields);
 
 		$rows = $b->rows(
-			'SELECT '.$this->data.' FROM ~'.$this->table.'
+			'SELECT '.$this->data.' FROM '.$this->table.'
 			WHERE '.implode(' AND ', $likes[0]).' LIMIT '.$limit,
 			$likes[1]
 		);
@@ -183,7 +183,7 @@ class Temp {
 		}
 
 		$b->run(
-			'REPLACE INTO ~'.$this->table.' ('.$this->id.', '.$this->data.') VALUES ("{0}", "{1}")',
+			'REPLACE INTO '.$this->table.' ('.$this->id.', '.$this->data.') VALUES ("{0}", "{1}")',
 			[$this->key, var_export($this, true)]
 		);
 	}
@@ -193,7 +193,7 @@ class Temp {
 			return;
 		}
 
-		$b->run('DELETE FROM ~'.$this->table.' WHERE '.$this->id.' = "'.$this->key.'"');
+		$b->run('DELETE FROM '.$this->table.' WHERE '.$this->id.' = "'.$this->key.'"');
 	}
 
 	public function __get($name) {
@@ -237,7 +237,7 @@ class Temp {
 		}
 
 		if (!$b->run(
-			'INSERT INTO ~'.$table.'
+			'INSERT INTO '.$table.'
 			('.implode(', ', $fields).')
 			VALUES ('.$this->prepare($fields).')',
 			$this->field
@@ -262,7 +262,7 @@ class Temp {
 		}
 
 		if (!$b->run(
-			'REPLACE INTO ~'.$table.'
+			'REPLACE INTO '.$table.'
 			('.implode(', ', $fields).')
 			VALUES ('.$this->prepare($fields).')',
 			$this->field
@@ -282,13 +282,13 @@ class Temp {
 		}
 
 		if (!$b->run(
-			'REPLACE INTO ~'.$table.'
+			'REPLACE INTO '.$table.'
 			('.implode(', ', $fields).')
 			VALUES ('.$this->prepare($fields).')',
 			$this->field
 		)) return false;
 		
-		$b->run('DELETE FROM ~'.$this->table.' WHERE '.$this->id.' = "'.$this->key.'"');
+		$b->run('DELETE FROM '.$this->table.' WHERE '.$this->id.' = "'.$this->key.'"');
 		return true;
 	}
 

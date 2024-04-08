@@ -6,7 +6,6 @@
  */
 namespace Ultra\Data\Tool;
 
-use Ultra\Core;
 use Ultra\IO;
 
 class Replicator {

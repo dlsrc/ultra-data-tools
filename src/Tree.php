@@ -6,7 +6,7 @@
  */
 namespace Ultra\Data\Tool;
 
-use Ultra\Data\Inquirer;
+use Ultra\Data\Browser;
 
 final class Tree {
 	/**
@@ -61,7 +61,7 @@ final class Tree {
 	/**
 	* Метод переиндексации дерева.
 	*/
-	public function reindex(Inquirer $db, array $root = []): void {
+	public function reindex(Browser $db, array $root = []): void {
 		$db->run(
 			'UPDATE '.$this->table.' SET '.
 			''.$this->left.' = 0, '.
@@ -163,7 +163,7 @@ final class Tree {
 	* Метод перерасчета глубины вложенности узлов дерева
 	* @param string deep - имя поля в таблице хранящий уровень вложенности.
 	*/
-	public function levelizing(Inquirer $db, string $field): void {
+	public function levelizing(Browser $db, string $field): void {
 		if ('' != $this->serial) {
 			$order = 'ORDER BY '.$this->serial.' ASC, '.$this->id.' ASC';
 		}

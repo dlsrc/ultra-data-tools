@@ -7,7 +7,6 @@
 namespace Ultra\Data\Tool;
 
 use Ultra\Data\Browser;
-use Ultra\Data\Inquirer;
 
 final class TreeSegment {	
 	/**
