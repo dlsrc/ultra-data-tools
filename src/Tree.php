@@ -59,13 +59,13 @@ final class Tree {
 	}
 
 	/**
-	* Метод переиндексации дерева.
+	* Переиндексировать дерево.
 	*/
 	public function reindex(Browser $db, array $root = []): void {
 		$db->run(
 			'UPDATE '.$this->table.' SET '.
-			''.$this->left.' = 0, '.
-			''.$this->right.' = 0 '.
+			$this->left.' = 0, '.
+			$this->right.' = 0 '.
 			'WHERE '.$this->id.' <> 0'
 		);
 
@@ -78,15 +78,14 @@ final class Tree {
 
 		if (empty($root)) {
 			$node = $db->assoc(
-				'SELECT '.$this->id.' AS code FROM '.$this->table.' '.
-				'WHERE '.$this->pid.' = 0 '.$order
+				'SELECT '.$this->id.' AS code FROM '.$this->table.' WHERE '.$this->pid.' = 0 '.$order
 			);
 		}
 		else {
 			$node = [];
 
 			foreach ($root as $value) {
-				$node[] = ['code'=>$value];
+				$node[] = ['code' => $value];
 			}
 		}
 
@@ -98,8 +97,8 @@ final class Tree {
 		for ($i = 0; $i < $size; $i++) {
 			$db->run(
 				'UPDATE '.$this->table.' SET '.
-				''.$this->left.' = '.$left.', '.
-				''.$this->right.' = '.$right.' '.
+				$this->left.' = '.$left.', '.
+				$this->right.' = '.$right.' '.
 				'WHERE '.$this->id.' = '.$node[$i]['code']
 			);
 
@@ -125,14 +124,12 @@ final class Tree {
 	
 		for (; $k < $size; $k++) {
 			$parent = $db->result(
-				'SELECT '.$this->pid.' '.
-				'FROM '.$this->table.' '.
+				'SELECT '.$this->pid.' FROM '.$this->table.' '.
 				'WHERE '.$this->id.' = '.$node[$k]['code']
 			);
 
 			$left = $db->result(
-				'SELECT '.$this->right.' '.
-				'FROM '.$this->table.' '.
+				'SELECT '.$this->right.' FROM '.$this->table.' '.
 				'WHERE '.$this->id.' = '.$parent
 			);
 		
@@ -140,28 +137,27 @@ final class Tree {
 
 			$db->run(
 				'UPDATE '.$this->table.' SET '.
-				''.$this->left.' = '.$this->left.' + 2 '.
+				$this->left.' = '.$this->left.' + 2 '.
 				'WHERE '.$this->left.' > '.$left
 			);
 
 			$db->run(
 				'UPDATE '.$this->table.' SET '.
-				''.$this->right.' = '.$this->right.' + 2 '.
+				$this->right.' = '.$this->right.' + 2 '.
 				'WHERE '.$this->right.' >= '.$left
 			);
 
 			$db->run(
 				'UPDATE '.$this->table.' SET '.
-				''.$this->left.' = '.$left.', '.
-				''.$this->right.' = '.$right.' '.
+				$this->left.' = '.$left.', '.
+				$this->right.' = '.$right.' '.
 				'WHERE '.$this->id.' = '.$node[$k]['code']
 			);
 		}
 	}
 
 	/**
-	* Метод перерасчета глубины вложенности узлов дерева
-	* @param string deep - имя поля в таблице хранящий уровень вложенности.
+	* Пересчитать глубину вложенности узлов дерева
 	*/
 	public function levelizing(Browser $db, string $field): void {
 		if ('' != $this->serial) {
@@ -172,14 +168,11 @@ final class Tree {
 		}
 
 		$db->run(
-			'UPDATE '.$this->table.' SET '.
-			''.$field.' = 1 '.
-			'WHERE '.$this->pid.' = 0'
+			'UPDATE '.$this->table.' SET '.$field.' = 1 WHERE '.$this->pid.' = 0'
 		);
 
 		$node = $db->combine(
-			'SELECT '.$this->id.' FROM '.$this->table.' '.
-			'WHERE '.$field.' = 1 '.$order
+			'SELECT '.$this->id.' FROM '.$this->table.' WHERE '.$field.' = 1 '.$order
 		);
 
 		for($deep = 2; sizeof($node) > 0; $deep++) {

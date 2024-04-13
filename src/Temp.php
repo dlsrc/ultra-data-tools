@@ -8,16 +8,17 @@ namespace Ultra\Data\Tool;
 
 use Ultra\Chars\Key;
 use Ultra\Data\Browser;
+use Ultra\Data\Statement;
 
 class Temp {
-	private $key;
-	private $table;
-	private $id;
-	private $data;
-	private $ts;
-	private $field;
+	private string $key;
+	private string $table;
+	private string $id;
+	private string $data;
+	private string $ts;
+	private array $field;
 
-	private function __construct($table, $id, $data, $ts, array $field=[], $key='') {
+	private function __construct($table, string $id, string $data, string $ts, array $field = [], string $key='') {
 		$this->key   = $key;
 		$this->table = $table;
 		$this->id    = $id;
@@ -26,48 +27,45 @@ class Temp {
 		$this->field = $field;
 	}
 
-	private function prepare(array $fields=[]) {
+	private function prepare(Browser $b, array $fields=[]): string {
 		$field = [];
 
-		if (empty($fields)) $fields = array_keys($this->field);
+		if (empty($fields)) {
+			$fields = array_keys($this->field);
+		}
+
+		$s = Statement::get($b);
+		$date = $s->current_date;
+		$time = $s->current_time;
+		$now  = $s->current_timestamp;
 
 		foreach ($this->field as $key => $val) {
 			if (!in_array($key, $fields)) {
 				continue;
 			}
 
-			switch ($val) {
-			case 'CURRENT_DATE': case 'CURRENT_TIME': case 'CURRENT_TIMESTAMP':
-			case 'CURDATE()':    case 'CURTIME()':    case 'NOW()':
-
-				$field[] = $val;
-				break;
-
-			default:
-
-				$field[] = '"{'.$key.'}"';
-			}	
+			$field[] = match ($val) {
+				$date, $time, $now => $val,
+				default => '"{'.$key.'}"',
+			};
 		}
 
 		return implode(', ', $field);
 	}
 
-	public static function __set_state(array $state) {
+	public static function __set_state(array $state): self {
 		return new Temp($state['table'], $state['id'], $state['data'], $state['ts'], $state['field'], $state['key']);
 	}
 
-	public static function open($table='temp', $id='temp_id', $data='temp_data', $ts='temp_ts') {
+	public static function open(string $table, string $id='temp_id', string $data='temp_data', string $ts='temp_ts'): self {
 		return new Temp($table, $id, $data, $ts);
 	}
 
 	/*
 	* Вернуть объект с ключем $key из таблицы table
 	*/
-	public static function read(Browser $b, $key, $table='temp', $id='temp_id', $data='temp_data') {
-		$data = $b->result(
-			'SELECT '.$data.' FROM '.$table.' WHERE BINARY '.$id.' = "{0}"',
-			[$key]
-		);
+	public static function read(Browser $b, string $key, string $table, string $id='temp_id', string $data='temp_data'): mixed {
+		$data = $b->result('SELECT '.$data.' FROM '.$table.' WHERE '.$id.' = "{0}"', [$key]);
 
 		if (!$data) {
 			return false;
@@ -79,7 +77,7 @@ class Temp {
 	/*
 	* Вернуть объект с параметром $name и значением $value из таблицы table
 	*/
-	public static function seek(Browser $b, $name, $value, $table='temp', $data='temp_data') {
+	public static function seek(Browser $b, string $name, string $value, string $table, string $data='temp_data'): mixed {
 		if (is_int($value) || ctype_digit($value)) {
 			$like = [
 				'\''.$name.'\' => \''.$value.'\'',
@@ -105,17 +103,17 @@ class Temp {
 		return @eval('return '.$data.';');
 	}
 
-	public function inData(Browser $b, array $fields) {
+	public function inData(Browser $b, array $fields): bool {
 		$likes = $this->getLikes($fields);
 		return (bool) $b->result('SELECT COUNT(*) FROM '.$this->table.' WHERE '.implode(' OR ', $likes[0]), $likes[1]);
 	}
 
-	public function isData(Browser $b, array $fields) {
+	public function isData(Browser $b, array $fields): bool {
 		$likes = $this->getLikes($fields);
 		return (bool) $b->result('SELECT COUNT(*) FROM '.$this->table.' WHERE '.implode(' AND ', $likes[0]), $likes[1]);
 	}
 
-	public function getData(Browser $b, array $fields, $limit = '1') {
+	public function getData(Browser $b, array $fields, int $limit = 1): array|false {
 		$likes = $this->getLikes($fields);
 
 		$rows = $b->rows(
@@ -135,7 +133,7 @@ class Temp {
 		return $rows;
 	}
 
-	private function getLikes(array $fields) {
+	private function getLikes(array $fields): array {
 		$likes  = [[], []];
 
 		foreach ($fields as $name => $value) {
@@ -146,14 +144,18 @@ class Temp {
 		return $likes;
 	}
 
-	public function fields() {
+	public function fields(): array {
 		return $this->field;
 	}
 
-	public function key(Browser $b, $target = false, $field = ['code'], $set = Key::CHR, $size = 7) {
+	public function key(
+		Browser $b,
+		array|string|null $target = null,
+		array|string $field = ['code'],
+		Key $set = Key::CHR,
+		int $size = 7,
+	): string {
 		if ('' == $this->key) {
-			$size = (int) $size;
-
 			if ($size < 1) {
 				$size = 7;
 			}
@@ -177,7 +179,7 @@ class Temp {
 		return $this->key;
 	}
 
-	public function write(Browser $b, $target = false, $field = 'code') {
+	public function write(Browser $b, array|string|null $target = null, array|string $field = 'code'): void {
 		if ('' == $this->key) {
 			$this->key($b, $target, $field);
 		}
@@ -188,7 +190,7 @@ class Temp {
 		);
 	}
 
-	public function delete(Browser $b) {
+	public function delete(Browser $b): void {
 		if ('' == $this->key) {
 			return;
 		}
@@ -196,7 +198,7 @@ class Temp {
 		$b->run('DELETE FROM '.$this->table.' WHERE '.$this->id.' = "'.$this->key.'"');
 	}
 
-	public function __get($name) {
+	public function __get(string $name): mixed {
 		if (isset($this->field[$name])) {
 			return $this->field[$name];
 		}
@@ -209,7 +211,7 @@ class Temp {
 		}
 	}
 
-	public function __set($name, $value) {
+	public function __set(string $name, string $value): void {
 		$this->field[$name] = $value;
 
 		if (NULL === $value) {
@@ -217,11 +219,11 @@ class Temp {
 		}
 	}
 
-	public function __unset($name) {
+	public function __unset(string $name): void {
 		unset($this->field[$name]);
 	}
 
-	public function insert(Browser $b, $table, array $fields=[]) {
+	public function insert(Browser $b, string $table, array $fields = []): string {
 		if (empty($this->field)) {
 			return false;
 		}
@@ -236,17 +238,14 @@ class Temp {
 			}
 		}
 
-		if (!$b->run(
-			'INSERT INTO '.$table.'
-			('.implode(', ', $fields).')
-			VALUES ('.$this->prepare($fields).')',
-			$this->field
-		)) return false;
+		if (!$b->run('INSERT INTO '.$table.' ('.implode(', ', $fields).') VALUES ('.$this->prepare($b, $fields).')', $this->field)) {
+			return false;
+		}
 
-		return $b->result('SELECT LAST_INSERT_ID()');
+		return $b->result('SELECT '.Statement::get($b)->last_insert_id);
 	}
 
-	public function replace(Browser $b, $table, array $fields=[]) {
+	public function replace(Browser $b, string $table, array $fields=[]): bool {
 		if (empty($this->field)) {
 			return false;
 		}
@@ -261,49 +260,46 @@ class Temp {
 			}
 		}
 
-		if (!$b->run(
-			'REPLACE INTO '.$table.'
-			('.implode(', ', $fields).')
-			VALUES ('.$this->prepare($fields).')',
-			$this->field
-		)) return false;
+		if (!$b->run('REPLACE INTO '.$table.' ('.implode(', ', $fields).') VALUES ('.$this->prepare($b, $fields).')', $this->field)) {
+			return false;
+		}
 
 		return true;
 	}
 
-	public function transfer(Browser $b, $table, array $fields=[])
-	{
-		if (empty($this->field)) return false;
-		if (empty($fields)) $fields = array_keys($this->field);
-
-		foreach ($fields as $key)
-		{
-			if (!isset($this->field[$key])) return false;
+	public function transfer(Browser $b, string $table, array $fields = []): bool {
+		if (empty($this->field)) {
+			return false;
 		}
 
-		if (!$b->run(
-			'REPLACE INTO '.$table.'
-			('.implode(', ', $fields).')
-			VALUES ('.$this->prepare($fields).')',
-			$this->field
-		)) return false;
+		if (empty($fields)) {
+			$fields = array_keys($this->field);
+		}
+
+		foreach ($fields as $key) {
+			if (!isset($this->field[$key])) {
+				return false;
+			}
+		}
+
+		if (!$b->run('REPLACE INTO '.$table.' ('.implode(', ', $fields).') VALUES ('.$this->prepare($b, $fields).')', $this->field)) {
+			return false;
+		}
 		
 		$b->run('DELETE FROM '.$this->table.' WHERE '.$this->id.' = "'.$this->key.'"');
+
 		return true;
 	}
 
-	public function curdate(Browser $b)
-	{
-		return $b->result('SELECT CURDATE()');
+	public function curdate(Browser $b): string	{
+		return $b->result('SELECT '.Statement::get($b)->current_date);
 	}
 
-	public function curtime(Browser $b)
-	{
-		return $b->result('SELECT CURTME()');
+	public function curtime(Browser $b): string	{
+		return $b->result('SELECT '.Statement::get($b)->current_time);
 	}
 
-	public function now(Browser $b)
-	{
-		return $b->result('SELECT NOW()');
+	public function now(Browser $b): string	{
+		return $b->result('SELECT '.Statement::get($b)->current_timestamp);
 	}
 }
