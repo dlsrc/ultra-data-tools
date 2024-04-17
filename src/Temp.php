@@ -46,7 +46,7 @@ class Temp {
 
 			$field[] = match ($val) {
 				$date, $time, $now => $val,
-				default => '"{'.$key.'}"',
+				default => '\'{'.$key.'}\'',
 			};
 		}
 
@@ -65,7 +65,7 @@ class Temp {
 	* Вернуть объект с ключем $key из таблицы table
 	*/
 	public static function read(Browser $b, string $key, string $table, string $id='temp_id', string $data='temp_data'): mixed {
-		$data = $b->result('SELECT '.$data.' FROM '.$table.' WHERE '.$id.' = "{0}"', [$key]);
+		$data = $b->result('SELECT '.$data.' FROM '.$table.' WHERE '.$id.' = \'{0}\'', [$key]);
 
 		if (!$data) {
 			return false;
@@ -77,21 +77,21 @@ class Temp {
 	/*
 	* Вернуть объект с параметром $name и значением $value из таблицы table
 	*/
-	public static function seek(Browser $b, string $name, string $value, string $table, string $data='temp_data'): mixed {
-		if (is_int($value) || ctype_digit($value)) {
+	public static function seek(Browser $b, string $name, int|float|string $value, string $table, string $data='temp_data'): mixed {
+		if (is_int($value) || is_float($value)) {
 			$like = [
 				'\''.$name.'\' => \''.$value.'\'',
 				'\''.$name.'\' => '.$value.',',
 			];
 
 			$data = $b->result(
-				'SELECT '.$data.' FROM '.$table.' WHERE '.$data.' LIKE "%{0}%" OR '.$data.' LIKE "%{1}%" LIMIT 1',
+				'SELECT '.$data.' FROM '.$table.' WHERE '.$data.' LIKE \'%{0}%\' OR '.$data.' LIKE \'%{1}%\' LIMIT 1',
 				$like
 			);
 		}
 		else {
 			$data = $b->result(
-				'SELECT '.$data.' FROM '.$table.' WHERE '.$data.' LIKE "%{0}%" LIMIT 1',
+				'SELECT '.$data.' FROM '.$table.' WHERE '.$data.' LIKE \'%{0}%\' LIMIT 1',
 				['\''.$name.'\' => \''.$value.'\'']
 			);
 		}
@@ -137,7 +137,7 @@ class Temp {
 		$likes  = [[], []];
 
 		foreach ($fields as $name => $value) {
-			$likes[0][$name]  = ''.$this->data.' LIKE "%{'.$name.'}%"';
+			$likes[0][$name]  = ''.$this->data.' LIKE \'%{'.$name.'}%\'';
 			$likes[1][$name] = '\''.$name.'\' => \''.$value.'\'';
 		}
 
@@ -185,7 +185,7 @@ class Temp {
 		}
 
 		$b->run(
-			'REPLACE INTO '.$this->table.' ('.$this->id.', '.$this->data.') VALUES ("{0}", "{1}")',
+			'REPLACE INTO '.$this->table.' ('.$this->id.', '.$this->data.') VALUES (\'{0}\', \'{1}\')',
 			[$this->key, var_export($this, true)]
 		);
 	}
@@ -195,7 +195,7 @@ class Temp {
 			return;
 		}
 
-		$b->run('DELETE FROM '.$this->table.' WHERE '.$this->id.' = "'.$this->key.'"');
+		$b->run('DELETE FROM '.$this->table.' WHERE '.$this->id.' = \''.$this->key.'\'');
 	}
 
 	public function __get(string $name): mixed {
@@ -286,7 +286,7 @@ class Temp {
 			return false;
 		}
 		
-		$b->run('DELETE FROM '.$this->table.' WHERE '.$this->id.' = "'.$this->key.'"');
+		$b->run('DELETE FROM '.$this->table.' WHERE '.$this->id.' = \''.$this->key.'\'');
 
 		return true;
 	}

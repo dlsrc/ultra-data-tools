@@ -80,7 +80,7 @@ final class TreeSegment {
 		$data = array_values($this->segment);
 
 		foreach (array_keys($segment) as $id) {
-			$segment[$id] = $segment[$id].' = "{'.$id.'}"';
+			$segment[$id] = $segment[$id].' = \'{'.$id.'}\'';
 		}
 
 		$segment = implode(' AND ', $segment);
@@ -188,7 +188,7 @@ final class TreeSegment {
 		$data = array_values($this->segment);
 
 		foreach (array_keys($segment) as $id) {
-			$segment[$id] = $segment[$id].' = "{'.$id.'}"';
+			$segment[$id] = $segment[$id].' = \'{'.$id.'}\'';
 		}
 
 		$segment = implode(' AND ', $segment);
