@@ -78,7 +78,7 @@ final class Tree {
 
 		if (empty($root)) {
 			$node = $db->assoc(
-				'SELECT '.$this->id.' AS code FROM '.$this->table.' WHERE '.$this->pid.' = 0 '.$order
+				'SELECT '.$this->id.' AS code FROM '.$this->table.' WHERE '.$this->pid.' IS NULL '.$order
 			);
 		}
 		else {
@@ -168,7 +168,7 @@ final class Tree {
 		}
 
 		$db->run(
-			'UPDATE '.$this->table.' SET '.$field.' = 1 WHERE '.$this->pid.' = 0'
+			'UPDATE '.$this->table.' SET '.$field.' = 1 WHERE '.$this->pid.' IS NULL'
 		);
 
 		$node = $db->combine(

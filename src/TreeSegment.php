@@ -102,7 +102,7 @@ final class TreeSegment {
 
 		$node = $db->assoc(
 			'SELECT '.$this->id.' AS code FROM '.$this->table.' '.
-			'WHERE '.$segment.' AND '.$this->pid.' = 0 '.$order,
+			'WHERE '.$segment.' AND '.$this->pid.' IS NULL '.$order,
 			$data
 		);
 
@@ -202,13 +202,13 @@ final class TreeSegment {
 
 		$db->run(
 			'UPDATE '.$this->table.' SET '.$this->deep.' = 1 '.
-			'WHERE '.$segment.' AND '.$this->pid.' = 0',
+			'WHERE '.$segment.' AND '.$this->pid.' IS NULL',
 			$data
 		);
 
 		$node = $db->combine(
 			'SELECT '.$this->id.' FROM '.$this->table.' '.
-			'WHERE '.$segment.' AND '.$this->pid.' = 0 '.$order,
+			'WHERE '.$segment.' AND '.$this->pid.' IS NULL '.$order,
 			$data
 		);
 
