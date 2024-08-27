@@ -166,13 +166,13 @@ class Temp {
 					$field[]  = $this->id;
 				}
 
-				$this->key = (new Unique($target, $field))->getCode($b, $set, $size, true);
+				$this->key = new Unique($target, $field)->getCode($b, $set, $size, true);
 			}
 			elseif (is_string($target)) {
-				$this->key = (new Unique([$target, $this->table], [$field, $this->id]))->getCode($b, $set, $size, true);
+				$this->key = new Unique([$target, $this->table], [$field, $this->id])->getCode($b, $set, $size, true);
 			}
 			else {
-				$this->key = (new Unique([$this->table], [$this->id]))->getCode($b, $set, $size, true);
+				$this->key = new Unique([$this->table], [$this->id])->getCode($b, $set, $size, true);
 			}
 		}
 
