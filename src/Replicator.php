@@ -13,19 +13,19 @@ class Replicator {
 	private $query;
 
 	public static function connect($exchanger) {
-		if (!\preg_match('/^https?\:\/\//is', $exchanger)) {
+		if (!preg_match('/^https?\:\/\//is', $exchanger)) {
 			$exchanger = 'http://'.$exchanger;
 		}
 
-		//$query = \file_get_contents($exchanger);
-		if (!$ch = \curl_init($exchanger)) {
+		//$query = file_get_contents($exchanger);
+		if (!$ch = curl_init($exchanger)) {
 			return false;
 		}
 
-		\curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		\curl_setopt($ch, CURLOPT_HEADER, false);
-		$query = \curl_exec($ch);
-		\curl_close($ch);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		$query = curl_exec($ch);
+		curl_close($ch);
 
 		if (!$query) {
 			return false;
@@ -87,18 +87,18 @@ class Replicator {
 			return false;
 		}
 
-		if (!$ch = \curl_init($src)) {
+		if (!$ch = curl_init($src)) {
 			return false;
 		}
 
-		if (!$fp = \fopen($dist, 'w')) {
+		if (!$fp = fopen($dist, 'w')) {
 			return false;
 		}
 
-		\curl_setopt($ch, CURLOPT_FILE, $fp);
-		$exec = \curl_exec($ch);
-		\curl_close($ch);
-		\fclose($fp);
+		curl_setopt($ch, CURLOPT_FILE, $fp);
+		$exec = curl_exec($ch);
+		curl_close($ch);
+		fclose($fp);
 		return $exec;
 	}
 
@@ -112,17 +112,17 @@ class Replicator {
 	}
 
 	private function getData($name='data') {
-		//if (!$query = \file_get_contents($this->server.'/index.php?'.Query::pack($this->query, true))) return false;
-		if (!$ch = \curl_init($this->server)) {
+		//if (!$query = file_get_contents($this->server.'/index.php?'.Query::pack($this->query, true))) return false;
+		if (!$ch = curl_init($this->server)) {
 			return false;
 		}
 
-		\curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		\curl_setopt($ch, CURLOPT_HEADER, false);
-		\curl_setopt($ch, CURLOPT_POST, true);
-		\curl_setopt($ch, CURLOPT_POSTFIELDS, [Query::NAME => Query::pack($this->query)]);
-		$query = \curl_exec($ch);
-		\curl_close($ch);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, [Query::NAME => Query::pack($this->query)]);
+		$query = curl_exec($ch);
+		curl_close($ch);
 
 		if (!$query) {
 			return false;

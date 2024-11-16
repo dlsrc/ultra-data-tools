@@ -43,7 +43,7 @@ class Exchanger {
 			exit(Query::pack($q));
 		}
 
-		if (!\file_exists($reg)) {
+		if (!file_exists($reg)) {
 			$q['errno'] = self::E_NOREG;
 			$q['error'] = 'Register not exists';
 			exit(Query::pack($q));
@@ -60,7 +60,7 @@ class Exchanger {
 		if (isset($q['action']) && 'SEND' == $q['action']) {
 			$dsn = 'type=sqlite3&db='.$reg.'&mode=full&prefix='.$q['prefix'];
 		}
-		elseif (isset($q['sql']) && 'SELECT' != \substr($q['sql'], 0, 6)) {
+		elseif (isset($q['sql']) && 'SELECT' != substr($q['sql'], 0, 6)) {
 			$dsn = 'type=sqlite3&db='.$reg.'&mode=full&prefix='.$q['prefix'];
 		}
 		else {
@@ -107,7 +107,7 @@ class Exchanger {
 				exit(Query::pack($q));
 			}
 
-			if (!\method_exists($b, $q['method'])) {
+			if (!method_exists($b, $q['method'])) {
 				$q['errno'] = self::E_NOMETHOD;
 				$q['error'] = 'Method not exists';
 				exit(Query::pack($q));
@@ -146,13 +146,13 @@ class Exchanger {
 
 			$q['post_id'] = $url[0];
 
-			if ($ch = \curl_init($url[1])) {
-				\curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-				\curl_setopt($ch, CURLOPT_HEADER, false);
-				\curl_setopt($ch, CURLOPT_POST, true);
-				\curl_setopt($ch, CURLOPT_POSTFIELDS, [Query::NAME => Query::pack($q)]);
-				$m = \curl_exec($ch);
-				\curl_close($ch);
+			if ($ch = curl_init($url[1])) {
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+				curl_setopt($ch, CURLOPT_HEADER, false);
+				curl_setopt($ch, CURLOPT_POST, true);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, [Query::NAME => Query::pack($q)]);
+				$m = curl_exec($ch);
+				curl_close($ch);
 				if ($m) exit($m);
 			}
 
