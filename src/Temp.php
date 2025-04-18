@@ -223,7 +223,7 @@ class Temp {
 		unset($this->field[$name]);
 	}
 
-	public function insert(Browser $b, string $table, array $fields = []): string {
+	public function insert(Browser $b, string $table, array $fields = []): string|false {
 		if (empty($this->field)) {
 			return false;
 		}
