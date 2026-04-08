@@ -1,6 +1,6 @@
 {
     "name": "ultra/data-tools",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "type": "library",
     "description": "This package is a part of the Ultra library.",
     "license": "MIT",
@@ -23,9 +23,9 @@
         }
     },
     "require": {
-        "php": ">=8.3",
-        "ultra/chars": "^1.0.0",
-        "ultra/core": "^1.0.0",
-        "ultra/data": "^2.0.0"
+        "php": ">=8.4",
+        "ultra/chars": "^1.2.0",
+        "ultra/core": "^2.1.0",
+        "ultra/data": "^2.5.0"
     }
 }
