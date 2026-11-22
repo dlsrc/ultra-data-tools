@@ -31,6 +31,8 @@ final class Unique {
 			return '';
 		}
 
+		$count = 0;
+
 		do {
 			$code = $key->gen(length: $length, nodigits: $nod);
 

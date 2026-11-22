@@ -9,10 +9,10 @@ namespace Ultra\Data\Tool;
 use Ultra\IO;
 
 class Replicator {
-	private $server;
-	private $query;
+	private string $server;
+	private array $query;
 
-	public static function connect($exchanger) {
+	public static function connect(string $exchanger) {
 		if (!preg_match('/^https?\:\/\//is', $exchanger)) {
 			$exchanger = 'http://'.$exchanger;
 		}
@@ -25,7 +25,6 @@ class Replicator {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_HEADER, false);
 		$query = curl_exec($ch);
-		curl_close($ch);
 
 		if (!$query) {
 			return false;
@@ -38,18 +37,18 @@ class Replicator {
 		return new Replicator($exchanger, $q);
 	}
 
-	private function __construct($server, array $query) {
+	private function __construct(string $server, array $query) {
 		$this->server = $server;
 		$this->query  = $query;
 		$this->query['host'] = $_SERVER['HTTP_HOST'];
 	}
 
-	public function __get($name) {
+	public function __get(string $name) {
 		if (isset($this->query[$name])) return $this->query[$name];
 		return false;
 	}
 
-	public function __call($name, $value) {
+	public function __call(string $name, array $value) {
 		switch ($name) {
 		case 'rows': case 'assoc': case 'column': case 'combine':
 		case 'table': case 'view': case 'row': case 'result':
@@ -82,7 +81,7 @@ class Replicator {
 		}
 	}
 
-	public function copy($src, $dist) {
+	public function copy(string $src, string $dist) {
 		if (!IO::indir($dist)) {
 			return false;
 		}
@@ -97,12 +96,11 @@ class Replicator {
 
 		curl_setopt($ch, CURLOPT_FILE, $fp);
 		$exec = curl_exec($ch);
-		curl_close($ch);
 		fclose($fp);
 		return $exec;
 	}
 
-	private function sql($method, $sql, array $value=[]) {
+	private function sql(string $method, string $sql, array $value=[]) {
 		unset($this->query['data'], $this->query['errno'], $this->query['error']);
 		$this->query['action'] = 'SQL';
 		$this->query['method'] = $method;
@@ -122,7 +120,6 @@ class Replicator {
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, [Query::NAME => Query::pack($this->query)]);
 		$query = curl_exec($ch);
-		curl_close($ch);
 
 		if (!$query) {
 			return false;

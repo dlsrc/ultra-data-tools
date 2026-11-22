@@ -18,7 +18,7 @@ class Temp {
 	private string $ts;
 	private array $field;
 
-	private function __construct($table, string $id, string $data, string $ts, array $field = [], string $key='') {
+	private function __construct(string $table, string $id, string $data, string $ts, array $field = [], string $key='') {
 		$this->key   = $key;
 		$this->table = $table;
 		$this->id    = $id;

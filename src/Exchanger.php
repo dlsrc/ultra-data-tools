@@ -29,7 +29,7 @@ class Exchanger {
 	E_SEND     = 714,
 	E_EXISTS   = 715;
 
-	public static function run($token, $reg, $px='') {
+	public static function run(string $token, string $reg, string $px = '') {
 		Core::get()->listen();
 
 		if (!$q = Query::unpack(Query::NAME)) {
@@ -152,7 +152,6 @@ class Exchanger {
 				curl_setopt($ch, CURLOPT_POST, true);
 				curl_setopt($ch, CURLOPT_POSTFIELDS, [Query::NAME => Query::pack($q)]);
 				$m = curl_exec($ch);
-				curl_close($ch);
 				if ($m) exit($m);
 			}
 
